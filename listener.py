@@ -1,16 +1,7 @@
 import sys
 from socket import socket, AF_INET, SOCK_DGRAM
-from utils.FH5 import FH5_API
-
-
-def get_gear_name(gear):
-    match gear:
-        case 0:
-            return 'R'
-        case -1:
-            return 'N'
-        case _:
-            return '%d' % gear
+from utils import FH5_API
+from utils.DataHelper import *
 
 s = socket(AF_INET, SOCK_DGRAM)
 s.bind(('localhost', 8000))
@@ -24,7 +15,10 @@ try:
         speed = api.fh_data.Speed
         engine_rpm = api.fh_data.CurrentEngineRpm
         gear = api.fh_data.Gear
-        content = 'Speed: %.1fkm/h    Engine: %.0f rpm    Gear: %s' % (speed * 3.6, engine_rpm, get_gear_name(gear))
+        content = 'Speed: {:.1f} km/h    Engine: {:.0f} rpm    Gear: {}'.format(
+            get_speed_kph(speed),
+            engine_rpm,
+            get_gear_name(gear))
         sys.stdout.write(' ' * print_high_water + '\b' * print_high_water)
         sys.stdout.write('\b' * last_print_size)
         last_print_size = sys.stdout.write(content)
