@@ -1,6 +1,5 @@
 import sys
 from socket import socket, AF_INET, SOCK_DGRAM
-
 from utils.FH5 import FH5_API
 
 
@@ -16,6 +15,7 @@ def get_gear_name(gear):
 s = socket(AF_INET, SOCK_DGRAM)
 s.bind(('localhost', 8000))
 api = FH5_API()
+
 try:
     print_high_water = 0
     last_print_size = 0
