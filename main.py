@@ -55,14 +55,12 @@ class Listener(threading.Thread):
 
 def main():
     app = QGuiApplication(sys.argv)
+    app.setApplicationName('FH5 Telemetry')
     QQuickStyle.setStyle('Material')
-    engine = QQmlApplicationEngine()
-    rootContext = engine.rootContext()
-    # backend = Backend()
-    # rootContext.setContextProperty('backend', backend)
-    qmlRegisterType(Backend, 'BackendPlugin', 1, 0, 'Backend')
-    engine.load(QUrl.fromLocalFile('main.qml'))
 
+    qmlRegisterType(Backend, 'BackendPlugin', 1, 0, 'Backend')
+    engine = QQmlApplicationEngine()
+    engine.load(QUrl.fromLocalFile('main.qml'))
 
     if not engine.rootObjects():
         sys.exit(-1)
@@ -70,6 +68,8 @@ def main():
     obj = engine.rootObjects()[0]
     backend =  obj.findChild(Backend)
 
+
+    
     listener = Listener(backend)
     listener.start()
     sys.exit(app.exec())
