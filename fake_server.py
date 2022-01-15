@@ -20,7 +20,7 @@ def run_server():
             for payload in payloads:
                 s.sendto(payload, ('localhost', 8000))
                 print('sent')
-                sleep(0.0035)
+                sleep(0.035)
     except KeyboardInterrupt:
         print('[server] bye~')
     except Exception as e:
