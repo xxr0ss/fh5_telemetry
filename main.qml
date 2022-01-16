@@ -41,7 +41,7 @@ ApplicationWindow {
                     radius: engine_display_background.radius
                     width: engine_display.cur_rpm / engine_display.max_rpm * parent.width
                     z: engine_display_background.z + 1
-                    color: "#d82a3f"
+                    color: "blue"
                 }
                 Rectangle {
                     id: engine_display_background
@@ -74,6 +74,8 @@ ApplicationWindow {
         function update_engine_display() {
             engine_display.cur_rpm = Math.round(mybackend.fh5_data['CurrentEngineRpm'])
             engine_display.max_rpm = Math.round(mybackend.fh5_data['EngineMaxRpm'])
+            var ratio = engine_display.cur_rpm / engine_display.max_rpm
+            engine_display_foreground.color = Qt.rgba(ratio * ratio, 0.4 - ratio * ratio * 0.2, 0.1, 1)
         }
 
         function update_gear_display() {
