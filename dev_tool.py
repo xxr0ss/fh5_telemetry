@@ -1,4 +1,5 @@
 import re
+import os
 import time
 
 DAT_FILE = 'fh5.dat'
@@ -46,13 +47,12 @@ def refresh_FH5_py():
         lines.append("\t\t('{name}', {py_type})".format(
             name=name, py_type=py_type_table[dtype]))
     content_to_fill = ',\n'.join(lines)
-    with open('template/FH5.template.py', 'r') as f:
+    with open('FH5.py.in', 'r') as f:
         template = f.read()
     content = template.format(struct_fmt=generate_struct_fmt(),
                               fields=content_to_fill,
-                              creator=__name__,
-                              date = time.strftime('%Y-%m-%d %H:%M:%S'))
-    with open('utils/FH5api.py', 'w') as f:
+                              creator=__file__.split(os.sep)[-1])
+    with open('utils/FH5.py', 'w') as f:
         f.write(content)
 
 
