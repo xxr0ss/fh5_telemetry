@@ -145,7 +145,7 @@ ApplicationWindow {
             var gear_name
             if (gear == 0)
                 gear_name = 'R'
-            else if(gear == -1)
+            else if(gear > 10)
                 gear_name = 'N'
             else
                 gear_name = gear.toString()
