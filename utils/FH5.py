@@ -107,6 +107,8 @@ class FH5_Data(Structure):
     ]
 
 
+import json
+
 class FH5_API:
     def __init__(self, raw_data: bytes=b'') -> None:
         if raw_data==b'':
@@ -123,3 +125,9 @@ class FH5_API:
             self._fh_data = FH5_Data.from_buffer_copy(data)
         else:
             self._fh_data = data
+
+    def to_json(self):
+        d = {}
+        for f, _ in FH5_Data._fields_:
+            d[f] = getattr(self._fh_data, f)
+        return json.dumps(d)
