@@ -1,6 +1,7 @@
 import sys
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
 from threading import Thread, Event
+from utils import FH5_Data, FH5_API
 
 
 class Forward(Thread):
@@ -10,8 +11,10 @@ class Forward(Thread):
         self.sock_dst: socket = None
         self.dst_port = 0
         self._stop = Event()
+        self._jsonify = True
     
-    def config(self, dst_port=50000):
+    def config(self, dst_port=50000, jsonify=True):
+        self._jsonify = jsonify
         if self.sock_src:
             self.sock_dst.close()
         self.dst_port = dst_port
@@ -25,10 +28,10 @@ class Forward(Thread):
         self.sock_dst = sock_dst
     
     def run(self):
-        self.sock_src.settimeout()
         while not self._stop.is_set():
             raw_data = self.sock_src.recv(324)
-            self.sock_dst.sendto(raw_data, ('192.168.3.255', self.dst_port))
+            data = FH5_API(raw_data).to_json() if self._jsonify else raw_data
+            self.sock_dst.sendto(data, ('192.168.3.255', self.dst_port))
     
     def stop(self):
         self._stop.set()
