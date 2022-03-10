@@ -1,5 +1,6 @@
 import sys
-from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST
+from socket import (socket, AF_INET, SOCK_DGRAM, SOL_SOCKET,
+                    SO_BROADCAST, gethostname, gethostbyname)
 from threading import Thread, Event
 from utils import FH5_Data, FH5_API
 
@@ -10,9 +11,12 @@ class Forward(Thread):
         self.sock_src: socket = None
         self.sock_dst: socket = None
         self.dst_port = 0
-        self._stop = Event()
+        self._stop = False
         self._jsonify = True
-    
+        addr = gethostbyname(gethostname()).split('.')
+        addr[-1] = '255'
+        self.broadcast_addr = '.'.join(addr)
+
     def config(self, dst_port=50000, jsonify=True):
         self._jsonify = jsonify
         if self.sock_src:
@@ -26,15 +30,16 @@ class Forward(Thread):
         sock_dst = socket(AF_INET, SOCK_DGRAM)
         sock_dst.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self.sock_dst = sock_dst
-    
+
     def run(self):
-        while not self._stop.is_set():
+        while not self._stop:
             raw_data = self.sock_src.recv(324)
-            data = FH5_API(raw_data).to_json() if self._jsonify else raw_data
-            self.sock_dst.sendto(data, ('192.168.3.255', self.dst_port))
-    
+            data = FH5_API(raw_data).to_json(
+            ).encode() if self._jsonify else raw_data
+            self.sock_dst.sendto(data, (self.broadcast_addr, self.dst_port))
+
     def stop(self):
-        self._stop.set()
+        self._stop = True
 
 
 if __name__ == '__main__':
@@ -46,11 +51,11 @@ if __name__ == '__main__':
         forward.config(dst_port=dst_port)
     else:
         forward.config()
-    
+
     forward.start()
-    
+
     while True:
         if input().lower() in ('q', 'exit'):
             print('bye')
             forward.stop()
-            exit(0)
+            break
