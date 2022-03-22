@@ -2,11 +2,20 @@ from scapy.all import rdpcap
 from socket import socket, AF_INET, SOCK_DGRAM
 from time import sleep
 from threading import Thread, Event
+import sys
+import pathlib
 
 
 payloads = []
 
-packets = rdpcap('horizon.pcap')
+
+if len(sys.argv) > 1:
+    if not pathlib.Path.exists(sys.argv[1]):
+        print('please use a valid .pcap file')
+        exit(0)
+    packets = rdpcap(sys.argv[1])
+else:
+    packets = rdpcap('horizon.pcap')
 
 
 for pkt in packets:
